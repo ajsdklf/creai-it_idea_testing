@@ -1,16 +1,17 @@
 import type { Config } from "tailwindcss";
 
-export default {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class', // or 'media'
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    // add other paths as needed
   ],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        'custom-blue': '#1E3A8A', // Example deep blue
       },
     },
   },
