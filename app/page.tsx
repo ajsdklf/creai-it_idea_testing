@@ -29,13 +29,13 @@ export default function HomePage() {
         <div className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -bottom-48 -right-48 animate-pulse delay-700"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8 pt-32">
         {/* Logo */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-8 mt-16"
         >
           <Image
             src="/logo.png"
@@ -43,6 +43,7 @@ export default function HomePage() {
             width={180}
             height={60}
             className="object-contain"
+            priority
           />
         </motion.div>
 
