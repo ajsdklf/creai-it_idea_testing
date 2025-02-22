@@ -76,7 +76,7 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
               <div>
                 <h3 className="text-lg font-semibold text-purple-400 mb-2">즉시 분석</h3>
                 <p className="text-gray-200">
-                  준비된 아이디어가 있다면 '바로 분석해보기'를 통해 
+                  준비된 아이디어가 있다면 &apos;바로 분석해보기&apos;를 통해 
                   즉시 VC 관점의 평가를 받아볼 수 있습니다.
                 </p>
               </div>
