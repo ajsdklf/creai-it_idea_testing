@@ -1,7 +1,7 @@
 // app/result/page.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PopupCREAIIT from '../components/PopUpCREAIIT';
 import { useSearchParams } from 'next/navigation';
@@ -10,7 +10,7 @@ import { FaChartLine, FaLightbulb, FaExclamationTriangle } from 'react-icons/fa'
 import { Typewriter } from 'react-simple-typewriter';
 import confetti from 'canvas-confetti';
 
-export default function ResultPage() {
+function ResultContent() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisResult, setAnalysisResult] = useState('');
   const [showPopup, setShowPopup] = useState(false);
@@ -130,5 +130,13 @@ export default function ResultPage() {
         {showPopup && !error && <PopupCREAIIT onClose={() => setShowPopup(false)} />}
       </div>
     </motion.div>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <ResultContent />
+    </Suspense>
   );
 }

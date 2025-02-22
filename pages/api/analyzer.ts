@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { Configuration, OpenAIApi } from 'openai-edge';
 
-const openai = new OpenAI({
+const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY
 });
+const openai = new OpenAIApi(config);
 
 export const runtime = 'edge';
 
@@ -11,11 +12,11 @@ export default async function handler(request: NextRequest) {
   try {
     const { userIdea } = await request.json();
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", 
+    const completion = await openai.createChatCompletion({
+      model: "gpt-4o-mini",
       messages: [
         {
-          role: "system",
+          role: "system", 
           content: "You are an expert business analyst. Analyze the given idea and provide a brief evaluation in Korean. Focus on market potential and feasibility."
         },
         {
@@ -26,7 +27,8 @@ export default async function handler(request: NextRequest) {
       max_tokens: 150
     });
 
-    const verdict = completion.choices[0].message.content || '분석을 완료하지 못했습니다.';
+    const result = await completion.json();
+    const verdict = result.choices[0].message.content || '분석을 완료하지 못했습니다.';
     return NextResponse.json({ verdict });
 
   } catch (error) {

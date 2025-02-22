@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { Configuration, OpenAIApi } from 'openai-edge';
 
-const openai = new OpenAI({
+const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY
 });
+const openai = new OpenAIApi(config);
 
 export const runtime = 'edge';
 
@@ -11,7 +12,7 @@ export default async function handler(request: NextRequest) {
   try {
     const { messages } = await request.json();
 
-    const completion = await openai.chat.completions.create({
+    const completion = await openai.createChatCompletion({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -23,7 +24,8 @@ export default async function handler(request: NextRequest) {
       max_tokens: 200
     });
 
-    const aiResponse = completion.choices[0].message;
+    const result = await completion.json();
+    const aiResponse = result.choices[0].message;
     return NextResponse.json(aiResponse);
 
   } catch (error) {

@@ -30,6 +30,22 @@ export default function HomePage() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
+        {/* Logo */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8"
+        >
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={180}
+            height={60}
+            className="object-contain"
+          />
+        </motion.div>
+
         <motion.div
           initial={{ y: -50 }}
           animate={{ y: 0 }}

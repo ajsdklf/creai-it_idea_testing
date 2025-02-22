@@ -40,18 +40,27 @@ export default function PopupCREAIIT({ onClose }: PopupProps) {
             <FaTimes size={24} />
           </button>
 
-          {/* Header with animation */}
+          {/* Logo and Header with animation */}
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
-            className="flex items-center space-x-3 mb-6"
+            className="flex flex-col items-center space-y-4 mb-6"
           >
-            <div className="bg-blue-500 p-3 rounded-full">
-              <FaBrain className="text-2xl text-white" />
+            <Image
+              src="/logo.png"
+              alt="CREAI+IT Logo"
+              width={140}
+              height={45}
+              className="object-contain"
+            />
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-500 p-3 rounded-full">
+                <FaBrain className="text-2xl text-white" />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+                CREAI+IT 학회
+              </h2>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
-              CREAI+IT 학회
-            </h2>
           </motion.div>
 
           {/* Content with icons */}
