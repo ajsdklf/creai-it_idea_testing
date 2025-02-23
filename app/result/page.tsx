@@ -6,7 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import PopupCREAIIT from '../components/PopUpCREAIIT';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaChartLine, FaLightbulb, FaExclamationTriangle } from 'react-icons/fa';
+import { FaChartLine, FaLightbulb, FaExclamationTriangle, FaArrowLeft } from 'react-icons/fa';
 import { Typewriter } from 'react-simple-typewriter';
 import confetti from 'canvas-confetti';
 
@@ -64,70 +64,85 @@ function ResultContent() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8"
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
-      <div className="max-w-4xl mx-auto">
-        {!analysisComplete ? (
-          <motion.div 
-            className="flex flex-col items-center justify-center min-h-[60vh]"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <LoadingSpinner />
-            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-              <Typewriter
-                words={[analysisType === 'vc' ? 'VC 관점에서 아이디어를 분석중입니다...' : '아이디어를 분석중입니다...']}
-                loop={true}
-                cursor
-                cursorStyle="_"
-              />
-            </h2>
-          </motion.div>
-        ) : error ? (
-          <motion.div 
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="bg-red-900/30 p-8 rounded-2xl backdrop-blur-lg border border-red-500/30"
-          >
-            <div className="flex items-center justify-center mb-6">
-              <FaExclamationTriangle className="text-5xl text-red-500 mr-4" />
-              <h1 className="text-3xl font-bold text-red-400">오류 발생</h1>
-            </div>
-            <p className="text-red-300 text-center text-lg">{error}</p>
-          </motion.div>
-        ) : (
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7 }}
-            className="bg-white/10 p-8 rounded-2xl backdrop-blur-lg border border-white/20"
-          >
-            <div className="flex items-center justify-center mb-8">
-              {analysisType === 'vc' ? 
-                <FaChartLine className="text-5xl text-blue-400 mr-4" /> :
-                <FaLightbulb className="text-5xl text-yellow-400 mr-4" />
-              }
-              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                {analysisType === 'vc' ? 'VC 분석 결과' : '아이디어 분석 결과'}
-              </h1>
-            </div>
-            
-            <motion.div 
-              className="prose prose-lg prose-invert max-w-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="bg-gray-800/50 p-8 rounded-xl shadow-2xl border border-gray-700">
-                <div className="whitespace-pre-line text-gray-200 leading-relaxed">
-                  {analysisResult}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+      {/* Back Button */}
+      <div className="fixed top-4 left-4 z-10">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-full backdrop-blur-sm border border-gray-700 text-gray-300 hover:text-white transition-colors"
+        >
+          <FaArrowLeft className="text-sm" />
+          <span className="hidden sm:inline">돌아가기</span>
+        </motion.button>
+      </div>
 
-        {showPopup && !error && <PopupCREAIIT onClose={() => setShowPopup(false)} />}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto">
+          {!analysisComplete ? (
+            <motion.div 
+              className="flex flex-col items-center justify-center min-h-[70vh] px-4"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <LoadingSpinner />
+              <h2 className="mt-8 text-lg sm:text-xl md:text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                <Typewriter
+                  words={[analysisType === 'vc' ? 'VC 관점에서 아이디어를 분석중입니다...' : '아이디어를 분석중입니다...']}
+                  loop={true}
+                  cursor
+                  cursorStyle="_"
+                />
+              </h2>
+            </motion.div>
+          ) : error ? (
+            <motion.div 
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              className="bg-red-900/30 p-6 sm:p-8 rounded-2xl backdrop-blur-lg border border-red-500/30 shadow-xl"
+            >
+              <div className="flex flex-col items-center gap-4 mb-6">
+                <FaExclamationTriangle className="text-3xl sm:text-4xl md:text-5xl text-red-500" />
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-red-400 text-center">오류 발생</h1>
+              </div>
+              <p className="text-red-300 text-center text-sm sm:text-base md:text-lg">{error}</p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.7 }}
+              className="bg-white/10 p-6 sm:p-8 rounded-2xl backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
+              <div className="flex flex-col items-center gap-4 mb-6 sm:mb-8">
+                {analysisType === 'vc' ? 
+                  <FaChartLine className="text-3xl sm:text-4xl md:text-5xl text-blue-400" /> :
+                  <FaLightbulb className="text-3xl sm:text-4xl md:text-5xl text-yellow-400" />
+                }
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                  {analysisType === 'vc' ? 'VC 분석 결과' : '아이디어 분석 결과'}
+                </h1>
+              </div>
+              
+              <motion.div 
+                className="prose prose-sm sm:prose-base md:prose-lg prose-invert max-w-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <div className="bg-gray-800/50 p-5 sm:p-6 md:p-8 rounded-xl shadow-2xl border border-gray-700">
+                  <div className="whitespace-pre-line text-gray-200 leading-relaxed text-sm sm:text-base">
+                    {analysisResult}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {showPopup && !error && <PopupCREAIIT onClose={() => setShowPopup(false)} />}
+        </div>
       </div>
     </motion.div>
   );

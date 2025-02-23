@@ -1,7 +1,7 @@
 // app/components/UsageGuidePopup.tsx
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaComments, FaRocket, FaTimes, FaQuestionCircle } from 'react-icons/fa';
+import { FaRocket, FaTimes, FaQuestionCircle, FaBrain, FaLightbulb, FaUsers } from 'react-icons/fa';
 
 interface PopupProps {
   onClose: () => void;
@@ -14,12 +14,12 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 flex items-center justify-center z-50 p-2 md:p-4"
       >
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
           onClick={onClose}
         />
         
@@ -27,11 +27,11 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", duration: 0.5 }}
-          className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 max-w-lg w-full text-white border border-gray-700 shadow-2xl"
+          className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-4 md:p-8 w-[95%] md:w-[600px] mx-auto text-white border border-gray-700 shadow-2xl overflow-y-auto max-h-[85vh] md:max-h-[80vh]"
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-white transition-colors duration-200 hover:rotate-90 transform"
           >
             <FaTimes size={24} />
           </button>
@@ -39,30 +39,34 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
-            className="flex items-center space-x-3 mb-6"
+            className="flex items-center gap-3 mb-6 md:mb-8"
           >
-            <div className="bg-purple-500 p-3 rounded-full">
-              <FaQuestionCircle className="text-2xl text-white" />
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-2.5 md:p-3 rounded-full shadow-lg">
+              <FaQuestionCircle className="text-xl md:text-2xl text-white" />
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
-              사용 가이드
+            <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text leading-tight">
+              AI+IT 스타트업 분석 가이드
             </h2>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 md:space-y-8">
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="flex items-start space-x-4"
+              className="flex items-start gap-4"
             >
-              <FaComments className="text-blue-400 text-xl mt-1" />
+              <FaBrain className="text-blue-400 text-xl mt-1.5 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-semibold text-blue-400 mb-2">대화형 분석</h3>
-                <p className="text-gray-200">
-                  AI와 대화하며 아이디어를 발전시키고 피드백을 받아보세요. 
-                  더 구체적인 아이디어 발전을 위한 질문들을 받게 됩니다.
+                <h3 className="text-lg md:text-xl font-semibold text-blue-400 mb-2">아이디어 발전하기</h3>
+                <p className="text-sm md:text-base text-gray-200 mb-3">
+                  AI와의 대화를 통해 아이디어를 구체화할 수 있습니다. 다음 세 가지 요소를 중심으로 설명해주세요:
                 </p>
+                <ul className="list-disc ml-4 md:ml-5 space-y-2 text-sm md:text-base text-gray-300">
+                  <li>아이디어 설명: 무엇을 만들고 싶으신가요?</li>
+                  <li>타겟 고객: 누구를 위한 서비스인가요?</li>
+                  <li>가치 제안: 어떤 문제를 해결하나요?</li>
+                </ul>
               </div>
             </motion.div>
 
@@ -70,14 +74,14 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="flex items-start space-x-4"
+              className="flex items-start gap-4 bg-white/5 p-4 md:p-6 rounded-xl"
             >
-              <FaRocket className="text-purple-400 text-xl mt-1" />
+              <FaLightbulb className="text-yellow-400 text-xl mt-1.5 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-semibold text-purple-400 mb-2">즉시 분석</h3>
-                <p className="text-gray-200">
-                  준비된 아이디어가 있다면 &apos;바로 분석해보기&apos;를 통해 
-                  즉시 VC 관점의 평가를 받아볼 수 있습니다.
+                <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-2">도움말 기능 활용하기</h3>
+                <p className="text-sm md:text-base text-gray-200">
+                  화면 오른쪽의 도움말 버튼을 클릭하면 현재 진행 상황을 확인하고, 
+                  AI에게 구체적인 질문을 할 수 있습니다. 막히는 부분이 있다면 언제든 도움을 요청하세요.
                 </p>
               </div>
             </motion.div>
@@ -86,11 +90,36 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-gray-700/50 p-6 rounded-xl border border-gray-600"
+              className="flex items-start gap-4"
             >
-              <p className="text-lg text-gray-200">
-                아이디어가 없으시더라도 관심 있는 분야나 기술에 대해 
-                자유롭게 이야기해 주세요. AI가 도와드립니다.
+              <FaRocket className="text-purple-400 text-xl mt-1.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold text-purple-400 mb-2">VC 관점의 분석받기</h3>
+                <p className="text-sm md:text-base text-gray-200 mb-3">
+                  아이디어가 충분히 구체화되었다면, VC 관점에서 다음 항목들을 분석받을 수 있습니다:
+                </p>
+                <ul className="list-disc ml-4 md:ml-5 space-y-2 text-sm md:text-base text-gray-300">
+                  <li>시장 규모와 성장 가능성</li>
+                  <li>비즈니스 모델의 실현 가능성</li>
+                  <li>경쟁사 분석</li>
+                  <li>투자 추천 의견</li>
+                </ul>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-br from-gray-800 to-gray-700/50 p-5 md:p-6 rounded-xl border border-gray-600 shadow-xl"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <FaUsers className="text-green-400 text-xl" />
+                <h3 className="text-lg md:text-xl font-semibold text-green-400">시작하기 전에</h3>
+              </div>
+              <p className="text-sm md:text-base text-gray-200">
+                구체적인 아이디어가 없으시더라도 걱정하지 마세요. 관심 있는 분야나 기술에 대해 
+                이야기하시면, AI가 아이디어 발굴부터 구체화까지 단계적으로 도와드립니다.
               </p>
             </motion.div>
           </div>
@@ -98,11 +127,11 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex justify-end mt-8"
+            transition={{ delay: 0.6 }}
+            className="flex justify-center md:justify-end mt-6 md:mt-8"
           >
             <button
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg"
+              className="w-full md:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-xl font-semibold text-base text-white transition-all duration-300 shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
               onClick={onClose}
             >
               시작하기
