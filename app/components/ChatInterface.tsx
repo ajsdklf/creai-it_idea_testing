@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { FaPaperPlane, FaRobot, FaUser } from 'react-icons/fa';
 
 interface Analysis {
@@ -65,7 +64,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
   const [typingDots, setTypingDots] = useState('');
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const chatContainerRef = useRef<null | HTMLDivElement>(null);
-  console.log(typingDots);
+  const [shouldScroll, setShouldScroll] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
@@ -77,15 +76,24 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
   }, [isLoading]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (shouldScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setShouldScroll(false);
+    }
   };
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setShouldScroll(true);
+    }
+  }, [messages]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       scrollToBottom();
     }, 100);
     return () => clearTimeout(timeoutId);
-  }, [messages]);
+  }, [shouldScroll]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,11 +156,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
     const isUser = message.role === 'user';
     
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
-      >
+      <div className={`flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
           ${isUser ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-purple-500 to-purple-600'}
           shadow-lg`}>
@@ -160,27 +164,18 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
         </div>
         
         <div className="flex flex-col max-w-[85%] sm:max-w-[80%]">
-          <motion.div 
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className={`p-3 sm:p-4 rounded-2xl shadow-lg ${
-              isUser 
-                ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white ml-auto' 
-                : 'bg-gradient-to-r from-gray-800 to-gray-700 text-gray-100'
-            }`}
-          >
+          <div className={`p-3 sm:p-4 rounded-2xl shadow-lg ${
+            isUser 
+              ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white ml-auto' 
+              : 'bg-gradient-to-r from-gray-800 to-gray-700 text-gray-100'
+          }`}>
             <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
               {message.content}
             </p>
-          </motion.div>
+          </div>
 
           {!isUser && message.analysis && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50"
-            >
+            <div className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50">
               {Object.entries(message.analysis).map(([key, value]) => (
                 <div key={key} className="flex items-center gap-2 sm:gap-3 mb-2 last:mb-0">
                   <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-xs
@@ -201,10 +196,10 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
                   </div>
                 </div>
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
-      </motion.div>
+      </div>
     );
   };
 
@@ -218,11 +213,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
           <MessageBubble key={idx} message={msg} />
         ))}
         {isLoading && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6"
-          >
+          <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
             <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
               <FaRobot className="w-3 h-3 sm:w-4 sm:h-4" />
             </div>
@@ -231,7 +222,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '400ms' }} />
             </div>
-          </motion.div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
