@@ -65,6 +65,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const chatContainerRef = useRef<null | HTMLDivElement>(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  console.log(typingDots);
 
   useEffect(() => {
     if (isLoading) {
