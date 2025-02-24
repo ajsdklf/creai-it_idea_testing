@@ -13,7 +13,7 @@ export default async function handler(request: NextRequest) {
     const { userIdea } = await request.json();
 
     const completion = await openai.createChatCompletion({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system", 
@@ -24,7 +24,8 @@ export default async function handler(request: NextRequest) {
           content: userIdea
         }
       ],
-      max_tokens: 500
+      max_tokens: 800,
+      temperature: 0
     });
 
     const result = await completion.json();

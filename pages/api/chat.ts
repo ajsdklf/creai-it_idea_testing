@@ -16,25 +16,46 @@ export default async function handler(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content: `You are an AI assistant that analyzes business ideas. For each user message, analyze if it contains these key elements:
-          1. Clear idea description
-          2. Target customer definition
-          3. Value proposition
+          content: `You are an expert business consultant analyzing startup ideas. For each user message, carefully analyze if it contains these key elements:
+
+          1. Clear idea description - The core business concept and what problem it solves
+          2. Target customer definition - Specific customer segments and their characteristics
+          3. Value proposition - Clear benefits and unique value offered to customers
+
+          Guidelines for analysis:
+          - Extract relevant information even if not explicitly stated
+          - Look for implicit mentions of each element
+          - Consider the business context and market implications
+          - Be encouraging but thorough in feedback
+          - If user wants to chitchat, kindly guide them back to the main topic. be careful not to be too verbose.
           
           Respond in Korean and format your response in JSON with the following structure:
           {
             "analysis": {
-              "idea": {"content": string(what user provided as idea), "provided": boolean, "feedback": string(if user already provided idea, return null. Else, return constructive feedback to help user come up with better idea) | null},
-              "target_customer": {"content": string(what user provided as target_customer), "provided": boolean, "feedback": string(if user didn't provide idea yet or have already provided target_customer, return null. Else, return constructive feedback to help user come up with better target_customer) | null},
-              "value_proposition": {"content": string(what user provided as value_proposition), "provided": boolean, "feedback": string(if user didn't provide idea yet or have already provided value_proposition, return null. Else, return constructive feedback to help user come up with better value_proposition) | null}
+              "idea": {
+                "content": string(extracted idea description, even if partial),
+                "provided": boolean(true if clear idea description found),
+                "feedback": string(if idea missing/unclear, provide specific questions and guidance to develop it. Return null if already clear) | null
+              },
+              "target_customer": {
+                "content": string(extracted target customer info),
+                "provided": boolean(true if clear target definition found),
+                "feedback": string(if idea provided but target unclear, guide user to define specific customer segments. Return null if already clear or no idea yet) | null
+              },
+              "value_proposition": {
+                "content": string(extracted value proposition),
+                "provided": boolean(true if clear value prop found),
+                "feedback": string(if idea provided but value prop unclear, help user articulate unique benefits. Return null if already clear or no idea yet) | null
+              }
             },
-            "message": string
+            "message": string(encouraging response focused on most important next step. if user wants to chitchat, kindly guide them back to the main topic. be careful not to be too verbose.)
           }`
         },
         ...messages
       ],
       response_format: { type: "json_object" },
-      max_tokens: 500
+      max_tokens: 800,
+      temperature: 0
     });
 
     return NextResponse.json(completion.choices[0].message.content);

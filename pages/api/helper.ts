@@ -24,14 +24,15 @@ export default async function handler(request: NextRequest) {
         - Keep responses concise and actionable
         - Be encouraging while pointing out areas that need work
         - Provide specific examples or questions to help users think deeper
-        - Always communicate in Korean with a professional but friendly tone`
+        - Always communicate in Korean with a professional but friendly tone
+        - Answer with 2~3 sentences at most`
         },
         {
           role: "user", 
           content: `Current development status:
-          ${currentStatus.idea ? '✓' : '•'} 아이디어 설명: ${currentStatus.idea || '미입력'}
-          ${currentStatus.target_customer ? '✓' : '•'} 타겟 고객: ${currentStatus.target_customer || '미입력'} 
-          ${currentStatus.value_proposition ? '✓' : '•'} 가치 제안: ${currentStatus.value_proposition || '미입력'}
+          ${currentStatus.idea.provided ? '✓' : '•'} 아이디어 설명: ${currentStatus.idea.content || '미입력'}
+          ${currentStatus.target_customer.provided ? '✓' : '•'} 타겟 고객: ${currentStatus.target_customer.content || '미입력'} 
+          ${currentStatus.value_proposition.provided ? '✓' : '•'} 가치 제안: ${currentStatus.value_proposition.content || '미입력'}
 
         사용자 질문: ${userPrompt}
 
@@ -39,7 +40,7 @@ export default async function handler(request: NextRequest) {
         }
       ],
       max_tokens: 500,
-      temperature: 0.7
+      temperature: 0
     });
 
     return NextResponse.json({ 

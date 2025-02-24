@@ -2,10 +2,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import { motion } from 'framer-motion';
-import { FaBrain, FaRocket, FaLightbulb } from 'react-icons/fa';
+import { FaBrain, FaRocket, FaLightbulb, FaArrowDown } from 'react-icons/fa';
 import { Typewriter } from 'react-simple-typewriter';
 import Image from 'next/image';
 import PopupCREAIIT from './components/PopUpCREAIIT';
@@ -47,6 +47,11 @@ export default function HomePage() {
     }
   });
 
+  // Add useEffect to scroll to top on initial load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleCREAIITPopupClose = () => {
     setShowCREAIITPopup(false);
     setShowUsageGuide(true);
@@ -72,40 +77,73 @@ export default function HomePage() {
         transition={{ duration: 0.8 }}
         className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
       >
-        {/* Refined background elements with better positioning and animation */}
+        {/* Enhanced background with more dynamic animations */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="absolute w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-blue-500/20 rounded-full blur-3xl -top-[20vw] -left-[20vw] animate-pulse"></div>
-          <div className="absolute w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-purple-500/20 rounded-full blur-3xl -bottom-[20vw] -right-[20vw] animate-pulse delay-700"></div>
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.3, 0.2]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] bg-blue-500/20 rounded-full blur-3xl -top-[25vw] -left-[25vw]"
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.3, 0.2]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4
+            }}
+            className="absolute w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] bg-purple-500/20 rounded-full blur-3xl -bottom-[25vw] -right-[25vw]"
+          />
         </div>
-        <div className="relative z-10 container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-          {/* Responsive logo container */}
+
+        <div className="relative z-10 container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          {/* Enhanced logo animation */}
           <motion.div
-            initial={{ y: -20, opacity: 0 }}
+            initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto w-full max-w-[80px] sm:max-w-[100px] lg:max-w-[120px] mb-8 lg:mb-16"
+            transition={{ 
+              duration: 1,
+              type: "spring",
+              stiffness: 100 
+            }}
+            className="mx-auto w-full max-w-[100px] sm:max-w-[120px] lg:max-w-[140px] mb-12 lg:mb-20 hover:scale-110 transition-transform duration-300"
           >
             <Image
               src="/logo.png"
               alt="Logo"
               width={360}
               height={120}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-contain drop-shadow-2xl"
               priority
             />
           </motion.div>
 
-          {/* Hero section with improved spacing and responsiveness */}
+          {/* Enhanced hero section with better visual hierarchy */}
           <motion.div
             initial={{ y: -50 }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.8, type: "spring" }}
-            className="text-center mb-12 lg:mb-16"
+            transition={{ duration: 1, type: "spring" }}
+            className="text-center mb-16 lg:mb-24"
           >
-            <div className="flex justify-center mb-6">
-              <FaBrain className="text-4xl lg:text-6xl text-blue-400" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 leading-tight mb-6">
+            <motion.div 
+              className="flex justify-center mb-8"
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.5 }}
+            >
+              <FaBrain className="text-5xl lg:text-7xl text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" />
+            </motion.div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-purple-500 leading-tight mb-8 drop-shadow-2xl">
               <Typewriter
                 words={['아이디어를 테스트하세요', '혁신을 시작하세요', '미래를 만드세요']}
                 loop={true}
@@ -116,26 +154,43 @@ export default function HomePage() {
                 delaySpeed={2000}
               />
             </h1>
+
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-3xl mx-auto"
+              transition={{ delay: 0.5 }}
+              className="text-xl sm:text-2xl lg:text-3xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-12"
             >
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                CREAI+IT 학회
-              </span>가 주최하는 AI+IT 스타트업 컨퍼런스에 오신 것을 환영합니다.
+                Powered by CREAI+IT
+              </span>
               <br className="hidden lg:block" />
-              최첨단 AI 기술로 당신의 아이디어를 분석하고 VC 관점에서 평가받아보세요.
+              <span className="opacity-90">
+                AI와 함께 여러분의 아이디어를 구체화하고, <br className="hidden sm:block" />
+                VC의 관점에서 평가받아보세요.
+              </span>
             </motion.p>
+
+            {/* Scroll indicator */}
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="flex flex-col items-center text-gray-400"
+            >
+              <span className="text-sm mb-2">시작하기</span>
+              <FaArrowDown className="text-xl" />
+            </motion.div>
           </motion.div>
 
-          {/* Chat interface with improved container styling */}
+          {/* Rest of the components remain the same */}
           <motion.div className="w-full max-w-5xl mx-auto backdrop-blur-lg bg-white/5 p-4 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-2xl mb-12">
             <ChatInterface onStatusUpdate={handleStatusUpdate} />
           </motion.div>
 
-          {/* Floating helper button with better positioning */}
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -145,7 +200,6 @@ export default function HomePage() {
             <FaLightbulb className="text-2xl text-white" />
           </motion.button>
 
-          {/* Action buttons with improved layout and responsiveness */}
           <motion.div 
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
