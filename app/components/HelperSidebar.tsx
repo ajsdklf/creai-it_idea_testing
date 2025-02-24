@@ -7,15 +7,19 @@ import { FaLightbulb, FaTimes, FaSpinner } from 'react-icons/fa';
 interface StatusType {
   idea: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   target_customer: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   value_proposition: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
+  };
+  etc: {
+    content: string;
+    provided: "true" | "false" | "partial";
   };
 }
 
@@ -51,6 +55,32 @@ export default function HelperSidebar({ isOpen, onClose, currentStatus }: Helper
     }
   };
 
+  const getStatusIcon = (provided: "true" | "false" | "partial") => {
+    switch(provided) {
+      case "true":
+        return "✓";
+      case "partial":
+        return "!";
+      case "false":
+        return "✕";
+      default:
+        return "";
+    }
+  };
+
+  const getStatusColor = (provided: "true" | "false" | "partial") => {
+    switch(provided) {
+      case "true":
+        return "text-green-400";
+      case "partial":
+        return "text-yellow-400";
+      case "false":
+        return "text-red-400";
+      default:
+        return "text-gray-400";
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -83,12 +113,19 @@ export default function HelperSidebar({ isOpen, onClose, currentStatus }: Helper
                   <h4 className="text-base sm:text-lg font-medium text-gray-200 mb-4">현재 상태</h4>
                   <ul className="space-y-3 sm:space-y-4">
                     {Object.entries(currentStatus).map(([key, value]) => (
-                      <li key={key} className={`flex flex-col gap-2 ${value.provided ? 'text-green-400' : 'text-gray-400'} 
+                      <li key={key} className={`flex flex-col gap-2 ${getStatusColor(value.provided)} 
                         bg-gray-800/50 rounded-lg p-3 border border-gray-700/50`}>
                         <div className="flex items-center gap-2 text-sm sm:text-base">
-                          • {key === 'idea' ? '아이디어 설명' : 
-                            key === 'target_customer' ? '타겟 고객' : '가치 제안'}: 
-                          <span className="font-medium">{value.provided ? '완료' : '미완료'}</span>
+                          {getStatusIcon(value.provided)} {
+                            key === 'idea' ? '아이디어 설명' : 
+                            key === 'target_customer' ? '타겟 고객' : 
+                            key === 'value_proposition' ? '가치 제안' :
+                            '추가 정보'
+                          }: 
+                          <span className="font-medium">
+                            {value.provided === "true" ? '완료' : 
+                             value.provided === "partial" ? '부분 완료' : '미완료'}
+                          </span>
                         </div>
                         {value.content && (
                           <p className="text-sm sm:text-base text-gray-300 ml-4 italic">&ldquo;{value.content}&rdquo;</p>

@@ -1,24 +1,28 @@
 // app/components/ChatInterface.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FaPaperPlane, FaRobot, FaUser } from 'react-icons/fa';
 
 interface Analysis {
   idea: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
     feedback: string | null;
   };
   target_customer: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
     feedback: string | null;
   };
   value_proposition: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
     feedback: string | null;
+  };
+  etc: {
+    content: string | null;
+    provided: "true" | "false" | "partial";
   };
 }
 
@@ -36,20 +40,25 @@ interface ChatResponse {
 interface StatusType {
   idea: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   target_customer: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   value_proposition: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
+  };
+  etc: {
+    content: string;
+    provided: "true" | "false" | "partial";
   };
 }
 
 interface ChatInterfaceProps {
   onStatusUpdate: (status: StatusType) => void;
+  onInvalidAnalysis?: () => void;
 }
 
 export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
@@ -65,7 +74,14 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const chatContainerRef = useRef<null | HTMLDivElement>(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<StatusType>({
+    idea: { content: '', provided: "false" },
+    target_customer: { content: '', provided: "false" },
+    value_proposition: { content: '', provided: "false" },
+    etc: { content: '', provided: "false" }
+  });
   console.log(typingDots);
+  console.log(currentStatus);
 
   useEffect(() => {
     if (isLoading) {
@@ -76,12 +92,12 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
     }
   }, [isLoading]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (shouldScroll) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       setShouldScroll(false);
     }
-  };
+  }, [shouldScroll]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -94,7 +110,7 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
       scrollToBottom();
     }, 100);
     return () => clearTimeout(timeoutId);
-  }, [shouldScroll]);
+  }, [shouldScroll, scrollToBottom]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,19 +144,28 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
       if (chatData.analysis) {
         const newStatus: StatusType = {
           idea: {
-            content: chatData.analysis.idea.provided ? chatData.analysis.idea.content : '',
+            content: chatData.analysis.idea.provided === "true" ? chatData.analysis.idea.content : '',
             provided: chatData.analysis.idea.provided
           },
           target_customer: {
-            content: chatData.analysis.target_customer.provided ? chatData.analysis.target_customer.content : '',
+            content: chatData.analysis.target_customer.provided === "true" ? chatData.analysis.target_customer.content : '',
             provided: chatData.analysis.target_customer.provided
           },
           value_proposition: {
-            content: chatData.analysis.value_proposition.provided ? chatData.analysis.value_proposition.content : '',
+            content: chatData.analysis.value_proposition.provided === "true" ? chatData.analysis.value_proposition.content : '',
             provided: chatData.analysis.value_proposition.provided
+          },
+          etc: {
+            content: chatData.analysis.etc?.content || '',
+            provided: chatData.analysis.etc?.content ? "true" : "false"
           }
         };
-        onStatusUpdate(newStatus);
+        setCurrentStatus(newStatus);
+
+        // Only update status if at least one element is provided
+        if (newStatus.idea.provided || newStatus.target_customer.provided || newStatus.value_proposition.provided || newStatus.etc.provided) {
+          onStatusUpdate(newStatus);
+        }
       }
     } catch (error) {
       console.error('Error:', error);
@@ -156,6 +181,47 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
   const MessageBubble = ({ message }: { message: Message }) => {
     const isUser = message.role === 'user';
     
+    const getStatusIcon = (provided: "true" | "false" | "partial") => {
+      switch(provided) {
+        case "true":
+          return "✓";
+        case "partial":
+          return "!";
+        case "false":
+          return "✕";
+        default:
+          return "";
+      }
+    };
+
+    const getStatusColor = (provided: "true" | "false" | "partial") => {
+      switch(provided) {
+        case "true":
+          return "bg-green-500";
+        case "partial":
+          return "bg-yellow-500";
+        case "false":
+          return "bg-red-500";
+        default:
+          return "bg-gray-600";
+      }
+    };
+
+    const getFieldLabel = (key: string) => {
+      switch(key) {
+        case 'idea':
+          return '아이디어 설명';
+        case 'target_customer':
+          return '타겟 고객';
+        case 'value_proposition':
+          return '가치 제안';
+        case 'etc':
+          return '기타';
+        default:
+          return '';
+      }
+    };
+
     return (
       <div className={`flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
@@ -177,26 +243,41 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
 
           {!isUser && message.analysis && (
             <div className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50">
-              {Object.entries(message.analysis).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-2 sm:gap-3 mb-2 last:mb-0">
-                  <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-xs
-                    ${value.provided ? 'bg-green-500' : 'bg-gray-600'} transition-colors duration-300`}>
-                    {value.provided && '✓'}
+              {Object.entries(message.analysis).map(([key, value]) => {
+                if (key === 'etc' && value.content) {
+                  return (
+                    <div key={key} className="mt-3 pt-3 border-t border-gray-700">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-xs
+                          ${getStatusColor(value.provided)} transition-colors duration-300`}>
+                          {getStatusIcon(value.provided)}
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-xs sm:text-sm text-gray-200">{getFieldLabel(key)}</span>
+                          <p className="text-[11px] sm:text-xs text-gray-300 mt-1">&ldquo;{value.content}&rdquo;</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div key={key} className="flex items-center gap-2 sm:gap-3 mb-2 last:mb-0">
+                    <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-xs
+                      ${getStatusColor(value.provided)} transition-colors duration-300`}>
+                      {getStatusIcon(value.provided)}
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-xs sm:text-sm text-gray-200">{getFieldLabel(key)}</span>
+                      {value.content && (
+                        <p className="text-[11px] sm:text-xs text-gray-300 mt-1">&ldquo;{value.content}&rdquo;</p>
+                      )}
+                      {value.feedback && (
+                        <p className="text-[11px] sm:text-xs text-gray-400 mt-1">{value.feedback}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <span className="text-xs sm:text-sm text-gray-200">
-                      {key === 'idea' ? '아이디어 설명' : 
-                      key === 'target_customer' ? '타겟 고객' : '가치 제안'}
-                    </span>
-                    {value.content && (
-                      <p className="text-[11px] sm:text-xs text-gray-300 mt-1">&ldquo;{value.content}&rdquo;</p>
-                    )}
-                    {value.feedback && (
-                      <p className="text-[11px] sm:text-xs text-gray-400 mt-1">{value.feedback}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

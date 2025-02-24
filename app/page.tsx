@@ -11,19 +11,24 @@ import Image from 'next/image';
 import PopupCREAIIT from './components/PopUpCREAIIT';
 import UsageGuidePopup from './components/UsageGuidePopup';
 import HelperSidebar from './components/HelperSidebar';
+import WarningPopup from './components/WarningPopup';
 
-interface StatusType {
+export type StatusType = {
   idea: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   target_customer: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
   };
   value_proposition: {
     content: string;
-    provided: boolean;
+    provided: "true" | "false" | "partial";
+  };
+  etc: {
+    content: string;
+    provided: "true" | "false" | "partial";
   };
 }
 
@@ -32,18 +37,23 @@ export default function HomePage() {
   const [showCREAIITPopup, setShowCREAIITPopup] = useState(true);
   const [showUsageGuide, setShowUsageGuide] = useState(false);
   const [showHelper, setShowHelper] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<StatusType>({
     idea: {
       content: '',
-      provided: false
+      provided: "false"
     },
     target_customer: {
       content: '',
-      provided: false
+      provided: "false"
     },
     value_proposition: {
       content: '',
-      provided: false
+      provided: "false"
+    },
+    etc: {
+      content: '',
+      provided: "false"
     }
   });
 
@@ -57,11 +67,32 @@ export default function HomePage() {
   };
 
   const handleDirectAnalysis = () => {
-    router.push('/result?type=direct');
+    const hasTrueContent = Object.values(currentStatus).some(
+      status => status.provided === "true"
+    );
+    
+    if (!hasTrueContent) {
+      setShowWarning(true);
+      return;
+    }
+
+    proceedToAnalysis();
   };
 
-  const handleStatusUpdate = (newStatus: StatusType) => {
-    setCurrentStatus(newStatus);
+  const proceedToAnalysis = () => {
+    // Construct query parameters
+    const queryParams = new URLSearchParams();
+    Object.entries(currentStatus).forEach(([key, value]) => {
+      if (value.provided !== "false" && value.content) {
+        queryParams.append(key, value.content);
+      }
+    });
+
+    router.push(`/result?${queryParams.toString()}`);
+  };
+
+  const handleStatusUpdate = (status: StatusType) => {
+    setCurrentStatus(status);
   };
 
   return (
@@ -182,10 +213,12 @@ export default function HomePage() {
           </motion.div>
 
           {/* Rest of the components remain the same */}
-          <motion.div className="w-full max-w-5xl mx-auto backdrop-blur-lg bg-white/5 p-4 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-2xl mb-12">
+          <motion.div 
+            className="w-full max-w-5xl mx-auto backdrop-blur-lg bg-white/5 p-4 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-2xl mb-12"
+            id="chat-section"
+          >
             <ChatInterface onStatusUpdate={handleStatusUpdate} />
           </motion.div>
-
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -234,6 +267,14 @@ export default function HomePage() {
         isOpen={showHelper}
         onClose={() => setShowHelper(false)}
         currentStatus={currentStatus}
+      />
+      <WarningPopup 
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        onProceed={() => {
+          setShowWarning(false);
+          proceedToAnalysis();
+        }}
       />
     </>
   );

@@ -82,6 +82,7 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
                   <li>아이디어 설명: 무엇을 만들고 싶으신가요?</li>
                   <li>타겟 고객: 누구를 위한 서비스인가요?</li>
                   <li>가치 제안: 어떤 문제를 해결하나요?</li>
+                  <li>기타: 기타 정보가 있으시다면 입력해주세요. (기술적 가능성, 시장 진입 전략, 등등 뭐든 상관 없습니다.)</li>
                 </ul>
               </div>
             </motion.div>
