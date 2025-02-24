@@ -1,3 +1,5 @@
+// app/components/WarningPopup.tsx
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaExclamationTriangle } from 'react-icons/fa';
@@ -11,12 +13,28 @@ interface WarningPopupProps {
 export default function WarningPopup({ isOpen, onClose, onProceed }: WarningPopupProps) {
   if (!isOpen) return null;
 
+  const handleProceed = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onProceed();
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+      onClick={handleClose}
+    >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md w-full mx-4"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-center text-yellow-500 mb-4">
           <FaExclamationTriangle size={40} />
@@ -33,13 +51,13 @@ export default function WarningPopup({ isOpen, onClose, onProceed }: WarningPopu
         
         <div className="flex gap-4">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
           >
             뒤로가기
           </button>
           <button
-            onClick={onProceed}
+            onClick={handleProceed}
             className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             분석 진행하기

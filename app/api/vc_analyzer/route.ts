@@ -68,24 +68,20 @@ export async function POST(request: NextRequest) {
           {
             "analysis": {
               "market_opportunity": {
-                "score": 0-25,
+                "score": 0-35,
                 "feedback": "Detailed feedback on market size, growth potential, timing"
               },
               "product_solution": {
-                "score": 0-20,
+                "score": 0-30,
                 "feedback": "Detailed feedback on innovation, technical feasibility, competitive advantage"
               },
               "business_model": {
-                "score": 0-20,
+                "score": 0-15,
                 "feedback": "Detailed feedback on revenue model, scalability, unit economics"
               },
               "competition_differentiation": {
-                "score": 0-15,
-                "feedback": "Detailed feedback on competitive landscape, barriers to entry, unique value prop"
-              },
-              "team_execution": {
                 "score": 0-10,
-                "feedback": "Detailed feedback on required capabilities, resource planning"
+                "feedback": "Detailed feedback on competitive landscape, barriers to entry, unique value prop"
               },
               "investment_potential": {
                 "score": 0-10,

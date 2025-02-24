@@ -6,9 +6,10 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import PopupCREAIIT from '../components/PopUpCREAIIT';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaChartLine, FaExclamationTriangle, FaArrowLeft } from 'react-icons/fa';
+import { FaChartLine, FaExclamationTriangle, FaArrowLeft, FaRocket, FaLightbulb } from 'react-icons/fa';
 import { Typewriter } from 'react-simple-typewriter';
 import confetti from 'canvas-confetti';
+import Image from 'next/image';
 
 interface VCAnalysisResult {
   market_opportunity: {
@@ -54,42 +55,91 @@ interface AnalysisInput {
   };
 }
 
-const addResultToRedis = async (result: VCAnalysisResult) => {
-  try {
-    const response = await fetch('/api/result_update', {
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        userName: 'test', 
-        vcAnalysis: result 
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to save result: ${errorData.error || response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log('Successfully saved to Redis:', data);
-  } catch (error) {
-    console.error('Failed to save result to Redis:', error);
-    // 여기서 에러를 throw하지 않고 로깅만 하여 분석 결과 표시는 계속 진행되도록 함
-  }
-};
-
 function ResultContent() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<VCAnalysisResult | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
 
   const searchParams = useSearchParams();
   const idea = searchParams?.get('idea') || '';
   const targetCustomer = searchParams?.get('target_customer') || '';
   const valueProposition = searchParams?.get('value_proposition') || '';
+  const messagesParam = searchParams?.get('messages') || '[]';
+
+  const saveToRedis = async (
+    messages?: Array<{ role: string; content: string }>,
+    analysis?: {
+      idea?: string;
+      target_customer?: string;
+      value_proposition?: string;
+      etc?: string;
+    },
+    vcAnalysis?: VCAnalysisResult
+  ) => {
+    try {
+      const userData = localStorage.getItem('userData');
+      const userName = userData ? JSON.parse(userData).userName : 'anonymous';
+      
+      const payload: {
+        userName: string;
+        messages?: Array<{ role: string; content: string }>;
+        analysis?: {
+          idea?: string;
+          target_customer?: string;
+          value_proposition?: string;
+          etc?: string;
+        };
+        vcAnalysis?: VCAnalysisResult;
+      } = {
+        userName: userName
+      };
+
+      if (messages?.length) {
+        payload.messages = messages;
+      }
+
+      if (analysis) {
+        payload.analysis = analysis;
+      }
+
+      if (vcAnalysis) {
+        payload.vcAnalysis = vcAnalysis;
+      }
+
+      const response = await fetch('/api/result_update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to save to Redis: ${errorData.error || response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Successfully saved to Redis:', data);
+      return data;
+    } catch (error) {
+      console.error('Failed to save to Redis:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    // URL 파라미터에서 메시지 가져오기
+    try {
+      const decodedMessages = JSON.parse(decodeURIComponent(messagesParam));
+      setMessages(decodedMessages);
+    } catch (error) {
+      console.error('Failed to parse messages:', error);
+      setMessages([]);
+    }
+  }, [messagesParam]);
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -131,25 +181,83 @@ function ResultContent() {
         setAnalysisComplete(true);
         setShowPopup(true);
 
-        // Save analysis result to Redis
-        await addResultToRedis(data.analysis);
+        // 현재 세션의 데이터만 Redis에 저장
+        await saveToRedis(
+          messages,
+          {
+            idea,
+            target_customer: targetCustomer,
+            value_proposition: valueProposition
+          },
+          data.analysis
+        );
 
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 }
         });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
+
+      } catch (error) {
+        console.error('Analysis failed:', error);
+        setError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
         setAnalysisComplete(true);
       }
     };
 
-    fetchAnalysis();
-  }, [idea, targetCustomer, valueProposition]);
+    if (idea || targetCustomer || valueProposition) {
+      fetchAnalysis();
+    }
+  }, [idea, targetCustomer, valueProposition, messages]); // Include messages dependency
 
   const renderVCAnalysis = (result: VCAnalysisResult) => (
     <div className="space-y-6">
+      {/* CREAI+IT Promotion Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="mb-12 bg-gradient-to-br from-blue-900/50 via-purple-900/50 to-blue-900/50 p-8 rounded-2xl border border-blue-500/30 shadow-xl"
+      >
+        <div className="flex flex-col items-center space-y-6">
+          <Image
+            src="/logo.png"
+            alt="CREAI+IT Logo"
+            width={160}
+            height={52}
+            className="object-contain"
+          />
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-purple-500 text-transparent bg-clip-text">
+              당신의 혁신적인 아이디어를 현실로 만들어보세요!
+            </h2>
+            <p className="text-gray-300 text-lg">
+              CREAI+IT과 함께라면 가능합니다
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+            <div className="flex items-start space-x-4">
+              <FaRocket className="text-blue-400 text-2xl flex-shrink-0 mt-1" />
+              <p className="text-gray-200">
+                최신 AI 기술을 배우고 실제 스타트업으로 발전시킬 수 있는 기회
+              </p>
+            </div>
+            <div className="flex items-start space-x-4">
+              <FaLightbulb className="text-yellow-400 text-2xl flex-shrink-0 mt-1" />
+              <p className="text-gray-200">
+                전문가 멘토링과 함께 아이디어를 검증하고 발전시키는 과정
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowPopup(true)}
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl font-bold text-white hover:opacity-90 transition-all duration-300 shadow-lg text-lg hover:shadow-xl hover:scale-105"
+          >
+            CREAI+IT 더 알아보기
+          </button>
+        </div>
+      </motion.div>
+
       {/* Summary Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-blue-400 mb-3">종합 평가</h2>

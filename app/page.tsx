@@ -2,16 +2,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import { motion } from 'framer-motion';
-import { FaBrain, FaRocket, FaLightbulb, FaArrowDown } from 'react-icons/fa';
+import { FaBrain, FaRocket, FaLightbulb, FaArrowDown, FaTrash } from 'react-icons/fa';
 import { Typewriter } from 'react-simple-typewriter';
 import Image from 'next/image';
 import PopupCREAIIT from './components/PopUpCREAIIT';
 import UsageGuidePopup from './components/UsageGuidePopup';
 import HelperSidebar from './components/HelperSidebar';
 import WarningPopup from './components/WarningPopup';
+import UserRegistrationPopup from './components/UserRegistrationPopup';
 
 export type StatusType = {
   idea: {
@@ -37,50 +38,13 @@ interface Message {
   content: string;
 }
 
-const saveToRedis = async (messages: Message[], analysis?: StatusType) => {
-  try {
-    const payload: any = {
-      userName: 'test'
-    };
-
-    if (messages?.length) {
-      payload.messages = messages;
-    }
-
-    if (analysis) {
-      payload.analysis = {
-        idea: analysis.idea.content,
-        target_customer: analysis.target_customer.content,
-        value_proposition: analysis.value_proposition.content,
-        etc: analysis.etc.content
-      };
-    }
-
-    const response = await fetch('/api/result_update', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('Successfully saved to Redis:', data);
-  } catch (error) {
-    console.error('Failed to save to Redis:', error);
-  }
-};
-
 export default function HomePage() {
   const router = useRouter();
   const [showCREAIITPopup, setShowCREAIITPopup] = useState(true);
   const [showUsageGuide, setShowUsageGuide] = useState(false);
   const [showHelper, setShowHelper] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [showUserRegistration, setShowUserRegistration] = useState(true);
   const [currentStatus, setCurrentStatus] = useState<StatusType>({
     idea: {
       content: '',
@@ -100,6 +64,11 @@ export default function HomePage() {
     }
   });
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
+  const [userData, setUserData] = useState<{
+    userName: string;
+    email?: string;
+    phone?: string;
+  } | null>(null);
 
   const handleCREAIITPopupClose = () => {
     setShowCREAIITPopup(false);
@@ -110,8 +79,31 @@ export default function HomePage() {
     setShowUsageGuide(false);
   };
 
+  const handleUserRegistration = (userData: {
+    userName: string;
+    email?: string;
+    phone?: string;
+  }) => {
+    setUserData(userData);
+    setShowUserRegistration(false);
+    setShowCREAIITPopup(true);
+    // Store user data in localStorage
+    localStorage.setItem('userData', JSON.stringify(userData));
+  };
+
+  // Load user data from localStorage on mount
+  useEffect(() => {
+    const savedUserData = localStorage.getItem('userData');
+    if (savedUserData) {
+      setUserData(JSON.parse(savedUserData));
+      setShowUserRegistration(false);
+    }
+  }, []);
+
   const handleMessagesUpdate = (messages: Message[]) => {
     setCurrentMessages(messages);
+    // Store messages in localStorage as well
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
   };
 
   const handleDirectAnalysis = () => {
@@ -119,18 +111,12 @@ export default function HomePage() {
       status => status.provided === "true"
     );
     
-    if (!hasTrueContent) {
+    if (!hasTrueContent && !showWarning) {
       setShowWarning(true);
       return;
     }
 
-    // Save only messages to Redis before proceeding
-    saveToRedis(currentMessages);
-    proceedToAnalysis();
-  };
-
-  const proceedToAnalysis = () => {
-    // Construct query parameters from currentStatus
+    // 현재 세션의 데이터만 사용
     const queryParams = new URLSearchParams();
     Object.entries(currentStatus).forEach(([key, value]) => {
       if (value.provided !== "false" && value.content) {
@@ -138,11 +124,31 @@ export default function HomePage() {
       }
     });
 
-    router.push(`/result?${queryParams.toString()}`);
+    // localStorage 사용하지 않고 state의 현재 메시지만 사용
+    router.push(`/result?${queryParams.toString()}&messages=${encodeURIComponent(JSON.stringify(currentMessages))}`);
   };
 
   const handleStatusUpdate = (status: StatusType) => {
     setCurrentStatus(status);
+  };
+
+  const handleStartOver = () => {
+    // Clear all localStorage
+    localStorage.clear();
+    
+    // Reset all states
+    setCurrentStatus({
+      idea: { content: '', provided: "false" },
+      target_customer: { content: '', provided: "false" },
+      value_proposition: { content: '', provided: "false" },
+      etc: { content: '', provided: "false" }
+    });
+    setCurrentMessages([]);
+    setUserData(null);
+    setShowUserRegistration(true);
+    
+    // Refresh the page to ensure clean slate
+    window.location.reload();
   };
 
   return (
@@ -267,9 +273,14 @@ export default function HomePage() {
             className="w-full max-w-5xl mx-auto backdrop-blur-lg bg-white/5 p-4 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-2xl mb-12"
             id="chat-section"
           >
+            {showUserRegistration && (
+              <UserRegistrationPopup onComplete={handleUserRegistration} />
+            )}
             <ChatInterface 
               onStatusUpdate={handleStatusUpdate}
               onMessagesUpdate={handleMessagesUpdate}
+              userData={userData}
+              onInvalidAnalysis={() => setShowWarning(true)}
             />
           </motion.div>
           <motion.button
@@ -310,6 +321,16 @@ export default function HomePage() {
               <FaRocket className="text-xl group-hover:translate-x-1 transition-transform" />
               바로 분석해보기
             </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-white py-4 px-8 rounded-full text-lg font-semibold shadow-lg transition-all duration-300 w-full sm:w-auto min-w-[240px]"
+              onClick={handleStartOver}
+            >
+              <FaTrash className="text-xl group-hover:rotate-12 transition-transform" />
+              처음부터 다시 시작
+            </motion.button>
           </motion.div>
         </div>
       </motion.section>
@@ -326,7 +347,14 @@ export default function HomePage() {
         onClose={() => setShowWarning(false)}
         onProceed={() => {
           setShowWarning(false);
-          proceedToAnalysis();
+          const queryParams = new URLSearchParams();
+          Object.entries(currentStatus).forEach(([key, value]) => {
+            if (value.provided !== "false" && value.content) {
+              queryParams.append(key, value.content);
+            }
+          });
+          localStorage.setItem('chatMessages', JSON.stringify(currentMessages));
+          router.push(`/result?${queryParams.toString()}`);
         }}
       />
     </>

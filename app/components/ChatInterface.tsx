@@ -1,4 +1,3 @@
-// app/components/ChatInterface.tsx
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -60,19 +59,20 @@ interface ChatInterfaceProps {
   onStatusUpdate: (status: StatusType) => void;
   onInvalidAnalysis?: () => void;
   onMessagesUpdate: (messages: Message[]) => void;
+  userData: {
+    userName: string;
+    email?: string;
+    phone?: string;
+  } | null;
 }
 
-const saveToRedis = async (messages: Message[]) => {
-  await fetch('/api/redis_util', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userName: 'test', messages }),
-  });
-};
-
-export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: ChatInterfaceProps) {
+export default function ChatInterface({ 
+  onStatusUpdate, 
+  onMessagesUpdate, 
+  userData,
+  onInvalidAnalysis 
+}: ChatInterfaceProps) {
+  console.log(onInvalidAnalysis);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -82,53 +82,52 @@ export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: Chat
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [typingDots, setTypingDots] = useState('');
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
-  const chatContainerRef = useRef<null | HTMLDivElement>(null);
-  const [shouldScroll, setShouldScroll] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [currentStatus, setCurrentStatus] = useState<StatusType>({
     idea: { content: '', provided: "false" },
     target_customer: { content: '', provided: "false" },
     value_proposition: { content: '', provided: "false" },
     etc: { content: '', provided: "false" }
   });
-  // console.log(typingDots);
-  // console.log(currentStatus);
+  const usingUnusedElements = [typingDots, currentStatus];
+  console.log(usingUnusedElements);
 
+  // 점(.) 로딩 애니메이션
   useEffect(() => {
+    let interval: NodeJS.Timeout;
     if (isLoading) {
-      const interval = setInterval(() => {
-        setTypingDots((prev: string) => prev.length >= 3 ? '' : prev + '.');
+      interval = setInterval(() => {
+        setTypingDots((prev) => prev.length >= 3 ? '' : prev + '.');
       }, 500);
-      return () => clearInterval(interval);
     }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isLoading]);
 
+  // 스크롤 함수
   const scrollToBottom = useCallback(() => {
-    if (shouldScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      setShouldScroll(false);
-    }
-  }, [shouldScroll]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
+  // messages가 바뀔 때마다 스크롤 실행
   useEffect(() => {
     if (messages.length > 0) {
-      setShouldScroll(true);
+      const timeoutId = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timeoutId);
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      scrollToBottom();
-    }, 100);
-    return () => clearTimeout(timeoutId);
-  }, [shouldScroll, scrollToBottom]);
-
+  // 메시지 전송 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim()) return;
 
-    const userMessage = { role: 'user', content: userInput };
-    setMessages(prev => [...prev, userMessage]);
+    const userMessage: Message = { role: 'user', content: userInput };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    onMessagesUpdate(updatedMessages);
     setUserInput('');
     setIsLoading(true);
 
@@ -136,64 +135,71 @@ export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: Chat
       const chatResponse = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          messages: updatedMessages,
+          userData: userData // 사용자 데이터 포함
+        }),
       });
 
-      if (!chatResponse.ok) throw new Error('Network response was not ok');
+      if (!chatResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
       
       const rawData = await chatResponse.json();
-      const chatData: ChatResponse = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
-      
+      const chatData: ChatResponse = typeof rawData === 'string'
+        ? JSON.parse(rawData)
+        : rawData;
+
       const assistantMessage: Message = {
         role: 'assistant',
         content: chatData.message,
         analysis: chatData.analysis
       };
 
-      const updatedMessages = [...messages, userMessage, assistantMessage];
-      setMessages(updatedMessages);
-      onMessagesUpdate(updatedMessages);
+      const newMessages = [...updatedMessages, assistantMessage];
+      setMessages(newMessages);
+      onMessagesUpdate(newMessages);
 
       if (chatData.analysis) {
         const newStatus: StatusType = {
           idea: {
-            content: chatData.analysis.idea.provided === "true" ? chatData.analysis.idea.content : '',
+            content: chatData.analysis.idea.content || '',
             provided: chatData.analysis.idea.provided
           },
           target_customer: {
-            content: chatData.analysis.target_customer.provided === "true" ? chatData.analysis.target_customer.content : '',
+            content: chatData.analysis.target_customer.content || '',
             provided: chatData.analysis.target_customer.provided
           },
           value_proposition: {
-            content: chatData.analysis.value_proposition.provided === "true" ? chatData.analysis.value_proposition.content : '',
+            content: chatData.analysis.value_proposition.content || '',
             provided: chatData.analysis.value_proposition.provided
           },
           etc: {
             content: chatData.analysis.etc?.content || '',
-            provided: chatData.analysis.etc?.content ? "true" : "false"
+            provided: chatData.analysis.etc?.provided || "false"
           }
         };
         setCurrentStatus(newStatus);
-
-        // Only update status if at least one element is provided
-        if (newStatus.idea.provided || newStatus.target_customer.provided || newStatus.value_proposition.provided || newStatus.etc.provided) {
-          onStatusUpdate(newStatus);
-        }
+        onStatusUpdate(newStatus);
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessages(prev => [...prev, {
+      const errorMessage = {
         role: 'assistant',
         content: '죄송합니다. 응답을 처리하는 중 오류가 발생했습니다. 다시 시도해 주세요.'
-      }]);
+      };
+      const newMessages = [...updatedMessages, errorMessage];
+      setMessages(newMessages);
+      onMessagesUpdate(newMessages);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 메시지 버블
   const MessageBubble = ({ message }: { message: Message }) => {
     const isUser = message.role === 'user';
-    
+
     const getStatusIcon = (provided: "true" | "false" | "partial") => {
       switch(provided) {
         case "true":
@@ -254,6 +260,7 @@ export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: Chat
             </p>
           </div>
 
+          {/* AI 분석 */}
           {!isUser && message.analysis && (
             <div className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50">
               {Object.entries(message.analysis).map(([key, value]) => {
@@ -307,6 +314,7 @@ export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: Chat
         {messages.map((msg, idx) => (
           <MessageBubble key={idx} message={msg} />
         ))}
+
         {isLoading && (
           <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
             <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
@@ -322,6 +330,7 @@ export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: Chat
         <div ref={messagesEndRef} />
       </div>
 
+      {/* 입력 폼 */}
       <form 
         onSubmit={handleSubmit}
         className="flex gap-2 sm:gap-3 relative"

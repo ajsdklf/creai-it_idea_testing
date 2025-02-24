@@ -1,7 +1,8 @@
+// app/api/data_fetching/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import redis from "../../../lib/redis";
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   if (request.method === 'GET') {

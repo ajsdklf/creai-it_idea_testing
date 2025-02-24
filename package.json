@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hapi/hawk": "^8.0.0",
     "canvas-confetti": "^1.9.3",
+    "crypto": "^1.0.1",
+    "dns": "^0.1.2",
     "framer-motion": "^12.4.7",
     "ioredis": "^5.5.0",
+    "net": "^1.0.2",
     "next": "15.1.7",
     "openai": "^4.85.3",
     "openai-edge": "^1.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-simple-typewriter": "^5.0.1"
+    "react-simple-typewriter": "^5.0.1",
+    "stream": "^0.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,3 +1,5 @@
+// app/api/result_update/route.ts
+
 import { NextRequest } from 'next/server';
 import redis from '../../../lib/redis';
 
@@ -41,11 +43,17 @@ interface StoredData {
     etc?: string;
   };
   vcAnalysis?: VCAnalysisResult;
+  userData?: {
+    email?: string;
+    phone?: string;
+  };
 }
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('Starting request handling...');
     const body = await req.json();
+    console.log('Received body:', body);
 
     if (!body) {
       return new Response(JSON.stringify({ error: 'Request body is missing' }), {
@@ -54,38 +62,66 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (!body.userName || (!body.messages && !body.analysis && !body.vcAnalysis)) {
-      return new Response(JSON.stringify({ error: 'userName and at least one of messages, analysis, or vcAnalysis are required' }), {
+    if (!body.userName) {
+      return new Response(JSON.stringify({ error: 'userName is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const { userName, messages, analysis, vcAnalysis } = body;
-    const existingData = await redis.get(userName);
-    let storedData: StoredData = existingData ? JSON.parse(existingData) : { messages: [] };
+    const { userName, messages, analysis, vcAnalysis, userData } = body;
+    console.log('Processing data for user:', userName);
 
-    if (messages) {
-      storedData.messages = [...storedData.messages, ...messages];
-    }
-    if (analysis) {
-      storedData.analysis = {
-        ...storedData.analysis,
-        ...analysis
-      };
-    }
-    if (vcAnalysis) {
-      storedData.vcAnalysis = vcAnalysis;
-    }
+    try {
+      const existingData = await redis.get(userName);
+      console.log('Existing Redis data:', existingData);
 
-    await redis.set(userName, JSON.stringify(storedData));
+      const storedData: StoredData = existingData 
+        ? JSON.parse(existingData)
+        : { messages: [] };
 
-    return new Response(JSON.stringify({ success: true, data: storedData }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+      if (messages?.length) {
+        storedData.messages = storedData.messages?.length 
+          ? [...storedData.messages, ...messages]
+          : messages;
+      }
+
+      if (analysis) {
+        storedData.analysis = {
+          ...storedData.analysis,
+          ...analysis
+        };
+      }
+
+      if (vcAnalysis) {
+        storedData.vcAnalysis = {
+          ...storedData.vcAnalysis,
+          ...vcAnalysis
+        };
+      }
+
+      if (userData?.email || userData?.phone) {
+        storedData.userData = {
+          ...storedData.userData,
+          email: userData.email,
+          phone: userData.phone,
+        };
+      }
+
+      console.log('Saving data to Redis:', storedData);
+      await redis.set(userName, JSON.stringify(storedData));
+      console.log('Successfully saved to Redis');
+
+      return new Response(JSON.stringify({ success: true, data: storedData }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (redisError) {
+      console.error('Redis operation failed:', redisError);
+      throw redisError;
+    }
   } catch (error) {
-    console.error('[POST /api/result_update] Handler error:', error);
+    console.error('Handler error:', error);
     return new Response(JSON.stringify({
       error: 'Failed to update result',
       details: (error as Error).message,
