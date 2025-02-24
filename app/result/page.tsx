@@ -54,6 +54,32 @@ interface AnalysisInput {
   };
 }
 
+const addResultToRedis = async (result: VCAnalysisResult) => {
+  try {
+    const response = await fetch('/api/result_update', {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        userName: 'test', 
+        vcAnalysis: result 
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to save result: ${errorData.error || response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Successfully saved to Redis:', data);
+  } catch (error) {
+    console.error('Failed to save result to Redis:', error);
+    // 여기서 에러를 throw하지 않고 로깅만 하여 분석 결과 표시는 계속 진행되도록 함
+  }
+};
+
 function ResultContent() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<VCAnalysisResult | null>(null);
@@ -68,8 +94,6 @@ function ResultContent() {
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
-        // Allow analysis even if some fields are missing
-
         const analysisInput: AnalysisInput = {
           idea: {
             content: idea,
@@ -106,6 +130,10 @@ function ResultContent() {
         setAnalysisResult(data.analysis);
         setAnalysisComplete(true);
         setShowPopup(true);
+
+        // Save analysis result to Redis
+        await addResultToRedis(data.analysis);
+
         confetti({
           particleCount: 100,
           spread: 70,

@@ -26,7 +26,7 @@ interface AnalysisInput {
   };
 }
 
-export default async function handler(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { analysisInput }: { analysisInput: AnalysisInput } = await request.json();
     

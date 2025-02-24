@@ -59,9 +59,20 @@ interface StatusType {
 interface ChatInterfaceProps {
   onStatusUpdate: (status: StatusType) => void;
   onInvalidAnalysis?: () => void;
+  onMessagesUpdate: (messages: Message[]) => void;
 }
 
-export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
+const saveToRedis = async (messages: Message[]) => {
+  await fetch('/api/redis_util', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userName: 'test', messages }),
+  });
+};
+
+export default function ChatInterface({ onStatusUpdate, onMessagesUpdate }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -80,8 +91,8 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
     value_proposition: { content: '', provided: "false" },
     etc: { content: '', provided: "false" }
   });
-  console.log(typingDots);
-  console.log(currentStatus);
+  // console.log(typingDots);
+  // console.log(currentStatus);
 
   useEffect(() => {
     if (isLoading) {
@@ -139,7 +150,9 @@ export default function ChatInterface({ onStatusUpdate }: ChatInterfaceProps) {
         analysis: chatData.analysis
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const updatedMessages = [...messages, userMessage, assistantMessage];
+      setMessages(updatedMessages);
+      onMessagesUpdate(updatedMessages);
 
       if (chatData.analysis) {
         const newStatus: StatusType = {

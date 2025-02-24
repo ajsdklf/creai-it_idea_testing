@@ -32,6 +32,49 @@ export type StatusType = {
   };
 }
 
+interface Message {
+  role: string;
+  content: string;
+}
+
+const saveToRedis = async (messages: Message[], analysis?: StatusType) => {
+  try {
+    const payload: any = {
+      userName: 'test'
+    };
+
+    if (messages?.length) {
+      payload.messages = messages;
+    }
+
+    if (analysis) {
+      payload.analysis = {
+        idea: analysis.idea.content,
+        target_customer: analysis.target_customer.content,
+        value_proposition: analysis.value_proposition.content,
+        etc: analysis.etc.content
+      };
+    }
+
+    const response = await fetch('/api/result_update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Successfully saved to Redis:', data);
+  } catch (error) {
+    console.error('Failed to save to Redis:', error);
+  }
+};
+
 export default function HomePage() {
   const router = useRouter();
   const [showCREAIITPopup, setShowCREAIITPopup] = useState(true);
@@ -56,6 +99,7 @@ export default function HomePage() {
       provided: "false"
     }
   });
+  const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
 
   const handleCREAIITPopupClose = () => {
     setShowCREAIITPopup(false);
@@ -64,6 +108,10 @@ export default function HomePage() {
 
   const handleUsageGuideClose = () => {
     setShowUsageGuide(false);
+  };
+
+  const handleMessagesUpdate = (messages: Message[]) => {
+    setCurrentMessages(messages);
   };
 
   const handleDirectAnalysis = () => {
@@ -76,11 +124,13 @@ export default function HomePage() {
       return;
     }
 
+    // Save only messages to Redis before proceeding
+    saveToRedis(currentMessages);
     proceedToAnalysis();
   };
 
   const proceedToAnalysis = () => {
-    // Construct query parameters
+    // Construct query parameters from currentStatus
     const queryParams = new URLSearchParams();
     Object.entries(currentStatus).forEach(([key, value]) => {
       if (value.provided !== "false" && value.content) {
@@ -217,7 +267,10 @@ export default function HomePage() {
             className="w-full max-w-5xl mx-auto backdrop-blur-lg bg-white/5 p-4 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-2xl mb-12"
             id="chat-section"
           >
-            <ChatInterface onStatusUpdate={handleStatusUpdate} />
+            <ChatInterface 
+              onStatusUpdate={handleStatusUpdate}
+              onMessagesUpdate={handleMessagesUpdate}
+            />
           </motion.div>
           <motion.button
             initial={{ opacity: 0 }}
