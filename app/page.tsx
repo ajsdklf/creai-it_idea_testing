@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ChatInterface from './components/ChatInterface';
 import { motion } from 'framer-motion';
 import { FaBrain, FaRocket, FaLightbulb, FaArrowDown } from 'react-icons/fa';
@@ -46,11 +46,6 @@ export default function HomePage() {
       provided: false
     }
   });
-
-  // Add useEffect to scroll to top on initial load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const handleCREAIITPopupClose = () => {
     setShowCREAIITPopup(false);

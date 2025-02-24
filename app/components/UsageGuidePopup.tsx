@@ -1,7 +1,7 @@
 // app/components/UsageGuidePopup.tsx
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRocket, FaTimes, FaQuestionCircle, FaBrain, FaLightbulb, FaUsers } from 'react-icons/fa';
+import { FaRocket, FaTimes, FaQuestionCircle, FaBrain, FaLightbulb, FaUsers, FaDesktop } from 'react-icons/fa';
 
 interface PopupProps {
   onClose: () => void;
@@ -50,6 +50,22 @@ export default function UsageGuidePopup({ onClose }: PopupProps) {
           </motion.div>
 
           <div className="space-y-6 md:space-y-8">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-start gap-4 bg-white/5 p-4 md:p-6 rounded-xl"
+            >
+              <FaDesktop className="text-blue-300 text-xl mt-1.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold text-blue-300 mb-2">최적의 사용 환경</h3>
+                <p className="text-sm md:text-base text-gray-200">
+                  더 나은 아이디어 발전과 분석을 위해 데스크톱/노트북 환경에서의 사용을 권장드립니다. 
+                  모바일에서도 이용 가능하지만, PC에서 더 편리한 경험을 제공해드릴 수 있습니다.
+                </p>
+              </div>
+            </motion.div>
+
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
