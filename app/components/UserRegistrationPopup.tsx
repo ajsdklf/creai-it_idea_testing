@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaEnvelope, FaPhone, FaTrophy, FaShareAlt } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaTrophy, FaShareAlt, FaArrowRight } from 'react-icons/fa';
 
 interface UserRegistrationPopupProps {
   onComplete: (userData: {
@@ -33,91 +33,114 @@ export default function UserRegistrationPopup({ onComplete }: UserRegistrationPo
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-0">
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md w-full mx-4"
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl"
       >
-        <h2 className="text-2xl font-bold text-white mb-4 text-center">
-          환영합니다!
-        </h2>
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
+            <FaUser className="text-blue-400 text-2xl" />
+          </div>
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+            환영합니다!
+          </h2>
+          <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-4"></div>
+        </div>
         
-        <div className="mb-6 space-y-3 text-gray-300">
+        <div className="mb-8 space-y-4 bg-gray-800/50 p-4 rounded-xl border border-gray-700/50">
           <div className="flex items-start gap-3">
-            <FaTrophy className="text-yellow-400 mt-1 flex-shrink-0" />
-            <p className="text-sm">
+            <div className="bg-yellow-500/10 p-2 rounded-lg">
+              <FaTrophy className="text-yellow-400 flex-shrink-0" />
+            </div>
+            <p className="text-sm text-gray-200">
               리더보드에서 다른 사용자들과 아이디어를 공유하고 순위를 확인해보세요.
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <FaShareAlt className="text-blue-400 mt-1 flex-shrink-0" />
-            <p className="text-sm">
+            <div className="bg-blue-500/10 p-2 rounded-lg">
+              <FaShareAlt className="text-blue-400 flex-shrink-0" />
+            </div>
+            <p className="text-sm text-gray-200">
               분석 결과를 저장하고 다른 사람들과 공유할 수 있습니다.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">
+            <label className="block text-gray-300 mb-2 text-sm font-medium">
               사용자 이름 <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative group">
+              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
               <input
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all duration-200"
                 placeholder="리더보드에 표시될 이름을 입력해주세요"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">
-              이메일 (선택) - 분석 결과 공유 및 알림용
+            <label className="block text-gray-300 mb-2 text-sm font-medium">
+              이메일 <span className="text-gray-500 font-normal">(선택)</span>
             </label>
-            <div className="relative">
-              <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative group">
+              <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all duration-200"
                 placeholder="결과 공유를 위한 이메일 주소"
               />
             </div>
+            <p className="text-xs text-gray-400 mt-1 ml-1">분석 결과 공유 및 알림용</p>
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">
-              전화번호 (선택) - 분석 결과 알림용
+            <label className="block text-gray-300 mb-2 text-sm font-medium">
+              전화번호 <span className="text-gray-500 font-normal">(선택)</span>
             </label>
-            <div className="relative">
-              <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative group">
+              <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all duration-200"
                 placeholder="결과 알림을 받을 전화번호"
               />
             </div>
+            <p className="text-xs text-gray-400 mt-1 ml-1">분석 결과 알림용</p>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-red-500 text-sm bg-red-500/10 p-2 rounded-lg border border-red-500/20"
+            >
+              {error}
+            </motion.p>
           )}
 
-          <button
+          <motion.button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 
-                     text-white py-2 px-4 rounded-lg font-medium transition-all duration-300"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+                     text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-blue-600/20
+                     flex items-center justify-center gap-2 mt-6"
           >
             시작하기
-          </button>
+            <FaArrowRight className="text-sm" />
+          </motion.button>
         </form>
       </motion.div>
     </div>

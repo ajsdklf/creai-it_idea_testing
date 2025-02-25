@@ -12,3 +12,10 @@ body {
   @apply bg-gray-900 text-gray-100;
   font-family: 'Pretendard', sans-serif; /* Example Korean-friendly font */
 }
+
+/* Disable animations globally */
+* {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
