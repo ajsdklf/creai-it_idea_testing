@@ -11,7 +11,7 @@ interface WarningPopupProps {
 }
 
 export default function WarningPopup({ isOpen, onClose, onProceed }: WarningPopupProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null; 
 
   const handleProceed = (e: React.MouseEvent) => {
     e.preventDefault();
