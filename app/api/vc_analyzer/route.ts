@@ -51,11 +51,11 @@ export async function POST(request: NextRequest) {
           Adjust scoring based on information completeness.
           
           Categories and max scores (total 100):
-          - Market Opportunity (35 points): Market size, growth potential, timing
-          - Product/Solution (30 points): Innovation, technical feasibility, competitive advantage
-          - Business Model (15 points): Revenue model, scalability, unit economics
-          - Competition & Differentiation (10 points): Competitive landscape, barriers to entry, unique value prop
-          - Investment Potential (10 points): Risk factors, potential returns, funding requirements
+          - Market Opportunity (25 points): Market size, growth potential, timing
+          - Product/Solution (25 points): Innovation, technical feasibility, competitive advantage
+          - Business Model (20 points): Revenue model, scalability, unit economics
+          - Originality (15 points): Unique value proposition, differentiation
+          - Investment Potential (15 points): Risk factors, potential returns, funding requirements
 
           Analyze based on these provided inputs:
           - Idea: The core business idea or concept
