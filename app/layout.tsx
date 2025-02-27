@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { Inter } from 'next/font/google';
 import Header from './components/Header';
+import { Analytics } from '@vercel/analytics/react';
 
 // Load Inter font with specific subsets
 const inter = Inter({
@@ -50,6 +51,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   );

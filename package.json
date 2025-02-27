@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hapi/hawk": "^8.0.0",
+    "@vercel/analytics": "^1.5.0",
     "canvas-confetti": "^1.9.3",
     "crypto": "^1.0.1",
     "dns": "^0.1.2",
