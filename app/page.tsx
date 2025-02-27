@@ -40,11 +40,12 @@ interface Message {
 
 export default function HomePage() {
   const router = useRouter();
-  const [showCREAIITPopup, setShowCREAIITPopup] = useState(true);
+  const [showCREAIITPopup, setShowCREAIITPopup] = useState(false);
   const [showUsageGuide, setShowUsageGuide] = useState(false);
   const [showHelper, setShowHelper] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-  const [showUserRegistration, setShowUserRegistration] = useState(true);
+  const [showUserRegistration, setShowUserRegistration] = useState(false);
+  const [showPreRegistrationGuide, setShowPreRegistrationGuide] = useState(true);
   const [currentStatus, setCurrentStatus] = useState<StatusType>({
     idea: {
       content: '',
@@ -79,6 +80,11 @@ export default function HomePage() {
     setShowUsageGuide(false);
   };
 
+  const handlePreRegistrationGuideClose = () => {
+    setShowPreRegistrationGuide(false);
+    setShowUserRegistration(true);
+  };
+
   const handleUserRegistration = (userData: {
     userName: string;
     email?: string;
@@ -96,6 +102,7 @@ export default function HomePage() {
     const savedUserData = localStorage.getItem('userData');
     if (savedUserData) {
       setUserData(JSON.parse(savedUserData));
+      setShowPreRegistrationGuide(false);
       setShowUserRegistration(false);
     }
   }, []);
@@ -419,16 +426,17 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {!showUserRegistration && showCREAIITPopup && <PopupCREAIIT onClose={handleCREAIITPopupClose} />}
-      {!showUserRegistration && showUsageGuide && <UsageGuidePopup onClose={handleUsageGuideClose} />}
-      {!showUserRegistration && (
+      {showPreRegistrationGuide && <UsageGuidePopup onClose={handlePreRegistrationGuideClose} />}
+      {!showPreRegistrationGuide && !showUserRegistration && showCREAIITPopup && <PopupCREAIIT onClose={handleCREAIITPopupClose} />}
+      {!showPreRegistrationGuide && !showUserRegistration && showUsageGuide && <UsageGuidePopup onClose={handleUsageGuideClose} />}
+      {!showPreRegistrationGuide && !showUserRegistration && (
         <HelperSidebar 
           isOpen={showHelper}
           onClose={() => setShowHelper(false)}
           currentStatus={currentStatus}
         />
       )}
-      {!showUserRegistration && (
+      {!showPreRegistrationGuide && !showUserRegistration && (
         <WarningPopup 
           isOpen={showWarning}
           onClose={() => setShowWarning(false)}
@@ -447,7 +455,7 @@ export default function HomePage() {
       )}
 
       {/* Enhanced helper button with contextual assistant */}
-      {!showUserRegistration && (
+      {!showPreRegistrationGuide && !showUserRegistration && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
