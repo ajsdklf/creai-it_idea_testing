@@ -67,27 +67,27 @@ export async function POST(request: NextRequest) {
           {
             "analysis": {
               "market_opportunity": {
-                "score": 0-35,
-                "feedback": "Detailed feedback on market size, growth potential, timing"
+                "score": 0-25,
+                "feedback": "시장 규모, 성장 잠재력, 시장 진입 타이밍, TAM/SAM/SOM 분석에 대한 전문적 평가"
               },
               "product_solution": {
-                "score": 0-30,
-                "feedback": "Detailed feedback on innovation, technical feasibility, competitive advantage"
+                "score": 0-25,
+                "feedback": "제품 혁신성, 기술적 실현 가능성, 경쟁 우위, 독창성(originality)에 대한 심층 분석"
               },
               "business_model": {
-                "score": 0-15,
-                "feedback": "Detailed feedback on revenue model, scalability, unit economics"
+                "score": 0-20,
+                "feedback": "수익 모델의 지속가능성, 확장성, 단위 경제성, 수익화 전략에 대한 평가"
               },
-              "competition_differentiation": {
-                "score": 0-10,
-                "feedback": "Detailed feedback on competitive landscape, barriers to entry, unique value prop"
+              "originality": {
+                "score": 0-15,
+                "feedback": "독창성(originality)에 대한 심층 분석"
               },
               "investment_potential": {
-                "score": 0-10,
-                "feedback": "Detailed feedback on risk factors, potential returns, funding requirements"
+                "score": 0-15,
+                "feedback": "투자 리스크 요소, 예상 수익률, 자금 조달 요건, 출구 전략에 대한 VC 관점의 평가"
               },
               "total_score": 0-100,
-              "summary": "Overall evaluation and recommendations for the startup"
+              "summary": "종합 평가 및 스타트업을 위한 전략적 제언"
             }
           }`
         },

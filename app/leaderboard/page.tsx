@@ -23,7 +23,7 @@ const categoryLabels: Record<string, string> = {
   market_opportunity: '시장 기회',
   product_solution: '제품 솔루션',
   business_model: '비즈니스 모델',
-  competition_differentiation: '경쟁 차별화',
+  originality: '독창성',
   investment_potential: '투자 잠재력',
 };
 
@@ -330,11 +330,11 @@ export default function LeaderboardPage() {
                     scores={selectedEntry.categoryScores} 
                     labels={categoryLabels}
                     maxScores={{ 
-                      market_opportunity: 10, 
-                      product_solution: 10, 
-                      business_model: 10, 
-                      competition_differentiation: 10, 
-                      investment_potential: 10 
+                      market_opportunity: 25, 
+                      product_solution: 25, 
+                      business_model: 20, 
+                      originality: 15, 
+                      investment_potential: 15 
                     }}
                   />
                 </div>

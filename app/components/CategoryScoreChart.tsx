@@ -19,11 +19,11 @@ const CategoryScoreChart: React.FC<CategoryScoreChartProps> = ({
   scores,
   labels,
   maxScores = {
-    market_opportunity: 35,
-    product_solution: 30,
-    business_model: 15,
-    competition_differentiation: 10,
-    investment_potential: 10
+    market_opportunity: 25,
+    product_solution: 25,
+    business_model: 20,
+    originality: 15,
+    investment_potential: 15
   },
   totalMaxScore = 100
 }) => {

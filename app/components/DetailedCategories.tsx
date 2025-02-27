@@ -17,7 +17,7 @@ export default function DetailedCategories({ result }: DetailedCategoriesProps) 
     },
     product_solution: { 
       name: '제품/솔루션', 
-      maxScore: 20,
+      maxScore: 25,
       icon: '🛠️'
     },
     business_model: { 
@@ -25,14 +25,14 @@ export default function DetailedCategories({ result }: DetailedCategoriesProps) 
       maxScore: 20,
       icon: '💼'
     },
-    competition_differentiation: { 
-      name: '경쟁력/차별화', 
+    originality: { 
+      name: '독창성', 
       maxScore: 15,
-      icon: '🏆'
+      icon: '💡'
     },
     investment_potential: { 
       name: '투자 잠재력', 
-      maxScore: 10,
+      maxScore: 15,
       icon: '💰'
     }
   };

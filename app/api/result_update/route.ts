@@ -18,7 +18,7 @@ interface VCAnalysisResult {
     score: number;
     feedback: string;
   };
-  competition_differentiation: {
+  originality: {
     score: number;
     feedback: string;
   };

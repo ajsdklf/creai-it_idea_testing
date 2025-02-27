@@ -16,7 +16,7 @@ interface VCAnalysisResult {
     score: number;
     feedback: string;
   };
-  competition_differentiation: {
+  originality: {
     score: number;
     feedback: string;
   };
@@ -90,7 +90,7 @@ export async function GET() {
             market_opportunity: parsedData.vcAnalysis.market_opportunity.score,
             product_solution: parsedData.vcAnalysis.product_solution.score,
             business_model: parsedData.vcAnalysis.business_model.score,
-            competition_differentiation: parsedData.vcAnalysis.competition_differentiation.score,
+            originality: parsedData.vcAnalysis.originality.score,
             investment_potential: parsedData.vcAnalysis.investment_potential.score,
           }
         };
