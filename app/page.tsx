@@ -414,69 +414,75 @@ export default function HomePage() {
             transition={{ delay: 1 }}
             className="mt-16 text-center text-gray-500 text-sm"
           >
-            <p>© 2023 CREAI+IT. All rights reserved.</p>
+            <p>© 2025 CREAI+IT. All rights reserved.</p>
           </motion.div>
         </div>
       </motion.section>
 
-      {showCREAIITPopup && <PopupCREAIIT onClose={handleCREAIITPopupClose} />}
-      {showUsageGuide && <UsageGuidePopup onClose={handleUsageGuideClose} />}
-      <HelperSidebar 
-        isOpen={showHelper}
-        onClose={() => setShowHelper(false)}
-        currentStatus={currentStatus}
-      />
-      <WarningPopup 
-        isOpen={showWarning}
-        onClose={() => setShowWarning(false)}
-        onProceed={() => {
-          setShowWarning(false);
-          const queryParams = new URLSearchParams();
-          Object.entries(currentStatus).forEach(([key, value]) => {
-            if (value.provided !== "false" && value.content) {
-              queryParams.append(key, value.content);
-            }
-          });
-          localStorage.setItem('chatMessages', JSON.stringify(currentMessages));
-          router.push(`/result?${queryParams.toString()}`);
-        }}
-      />
+      {!showUserRegistration && showCREAIITPopup && <PopupCREAIIT onClose={handleCREAIITPopupClose} />}
+      {!showUserRegistration && showUsageGuide && <UsageGuidePopup onClose={handleUsageGuideClose} />}
+      {!showUserRegistration && (
+        <HelperSidebar 
+          isOpen={showHelper}
+          onClose={() => setShowHelper(false)}
+          currentStatus={currentStatus}
+        />
+      )}
+      {!showUserRegistration && (
+        <WarningPopup 
+          isOpen={showWarning}
+          onClose={() => setShowWarning(false)}
+          onProceed={() => {
+            setShowWarning(false);
+            const queryParams = new URLSearchParams();
+            Object.entries(currentStatus).forEach(([key, value]) => {
+              if (value.provided !== "false" && value.content) {
+                queryParams.append(key, value.content);
+              }
+            });
+            localStorage.setItem('chatMessages', JSON.stringify(currentMessages));
+            router.push(`/result?${queryParams.toString()}`);
+          }}
+        />
+      )}
 
       {/* Enhanced helper button with contextual assistant */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="fixed z-50 bottom-6 right-6 lg:right-12 flex flex-col items-end gap-3"
-      >
-        {/* Add floating status indicator */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10, scale: 0.8 }}
-          animate={{ 
-            opacity: 1, 
-            y: 0, 
-            scale: 1,
-            transition: { delay: 2 }
-          }}
-          className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10"
-        >
-          {Object.values(currentStatus).some(status => status.provided === "true") ? 
-            "아이디어가 준비되었습니다 ✅" : "아이디어를 입력해주세요 👋"}
-        </motion.div>
-
-        {/* Main helper button with enhanced effects */}
-        <motion.button
+      {!showUserRegistration && (
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed z-50 bottom-6 right-6 lg:right-12 bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-          onClick={() => setShowHelper(true)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          className="fixed z-50 bottom-6 right-6 lg:right-12 flex flex-col items-end gap-3"
         >
-          <FaLightbulb className="text-2xl text-white group-hover:text-yellow-200 transition-colors" />
-          {/* Use CSS animation instead of motion.div */}
-          <div className="absolute inset-0 rounded-full bg-white/30 animate-ping-slow opacity-30"></div>
-        </motion.button>
-      </motion.div>
+          {/* Add floating status indicator */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: { delay: 2 }
+            }}
+            className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10"
+          >
+            {Object.values(currentStatus).some(status => status.provided === "true") ? 
+              "아이디어가 준비되었습니다 ✅" : "아이디어를 입력해주세요 👋"}
+          </motion.div>
+
+          {/* Main helper button with enhanced effects */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed z-50 bottom-6 right-6 lg:right-12 bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+            onClick={() => setShowHelper(true)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaLightbulb className="text-2xl text-white group-hover:text-yellow-200 transition-colors" />
+            {/* Use CSS animation instead of motion.div */}
+            <div className="absolute inset-0 rounded-full bg-white/30 animate-ping-slow opacity-30"></div>
+          </motion.button>
+        </motion.div>
+      )}
     </>
   );
 }

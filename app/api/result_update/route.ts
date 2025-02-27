@@ -22,10 +22,6 @@ interface VCAnalysisResult {
     score: number;
     feedback: string;
   };
-  team_execution: {
-    score: number;
-    feedback: string;
-  };
   investment_potential: {
     score: number;
     feedback: string;

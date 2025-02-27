@@ -1,4 +1,3 @@
-// app/api/leaderboard/route.ts
 import { NextResponse } from 'next/server';
 import redis from '../../../lib/redis';
 
@@ -119,4 +118,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+} 

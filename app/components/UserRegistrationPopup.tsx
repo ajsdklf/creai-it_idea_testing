@@ -75,7 +75,9 @@ export default function UserRegistrationPopup({ onComplete }: UserRegistrationPo
               사용자 이름 <span className="text-red-500">*</span>
             </label>
             <div className="relative group">
-              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
+                <FaUser className="text-gray-400 group-hover:text-blue-400 transition-colors" />
+              </div>
               <input
                 type="text"
                 value={userName}
@@ -91,7 +93,9 @@ export default function UserRegistrationPopup({ onComplete }: UserRegistrationPo
               이메일 <span className="text-gray-500 font-normal">(선택)</span>
             </label>
             <div className="relative group">
-              <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
+                <FaEnvelope className="text-gray-400 group-hover:text-blue-400 transition-colors" />
+              </div>
               <input
                 type="email"
                 value={email}
@@ -108,7 +112,9 @@ export default function UserRegistrationPopup({ onComplete }: UserRegistrationPo
               전화번호 <span className="text-gray-500 font-normal">(선택)</span>
             </label>
             <div className="relative group">
-              <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
+                <FaPhone className="text-gray-400 group-hover:text-blue-400 transition-colors" />
+              </div>
               <input
                 type="tel"
                 value={phone}
@@ -135,8 +141,8 @@ export default function UserRegistrationPopup({ onComplete }: UserRegistrationPo
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
-                     text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-blue-600/20
-                     flex items-center justify-center gap-2 mt-6"
+                    text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-blue-600/20
+                    flex items-center justify-center gap-2 mt-6"
           >
             시작하기
             <FaArrowRight className="text-sm" />

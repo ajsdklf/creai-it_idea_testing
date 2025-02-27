@@ -30,11 +30,6 @@ export default function DetailedCategories({ result }: DetailedCategoriesProps) 
       maxScore: 15,
       icon: '🏆'
     },
-    team_execution: { 
-      name: '팀/실행력', 
-      maxScore: 10,
-      icon: '👥'
-    },
     investment_potential: { 
       name: '투자 잠재력', 
       maxScore: 10,
