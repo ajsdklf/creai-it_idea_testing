@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaRocket, FaBrain, FaLightbulb, FaGlobe, FaInstagram, FaChevronDown, FaAward } from 'react-icons/fa';
+import { FaLightbulb, FaGlobe, FaInstagram, FaChevronDown, FaAward } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
 

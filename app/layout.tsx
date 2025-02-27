@@ -3,7 +3,6 @@ import '@/app/globals.css';
 import type { Metadata } from 'next';
 import React from 'react';
 import { Inter } from 'next/font/google';
-import { FaRocket } from 'react-icons/fa';
 import Header from './components/Header';
 
 // Load Inter font with specific subsets
